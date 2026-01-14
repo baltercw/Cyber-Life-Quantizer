@@ -1,0 +1,8 @@
+{
+  "name": "Cyber-Life Quantizer",
+  "description": "A cyberpunk-themed life tracking application that uses Gemini AI to analyze voice and image snippets, quantifying your daily experiences into RPG-style stats.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
