@@ -4,7 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="apple-mobile-web-app-capable" content="yes">
+  <!-- Fix: Use modern mobile web app tags -->
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="manifest" href="manifest.json">
   <title>Cyber-Life Quantizer</title>
@@ -17,7 +18,7 @@
       background-color: #050505;
       color: #00f3ff;
       font-family: 'JetBrains Mono', monospace;
-      overscroll-behavior-y: contain; /* Prevent pull-to-refresh on mobile */
+      overscroll-behavior-y: contain;
     }
     .font-cyber {
       font-family: 'Orbitron', sans-serif;
@@ -52,9 +53,25 @@
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
-    /* Mobile tap highlight remove */
     * {
       -webkit-tap-highlight-color: transparent;
+    }
+    /* Loading styles */
+    #root:empty::before {
+      content: "INITIALIZING NEURAL INTERFACE...";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.3em;
+      color: #00f3ff;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
     }
   </style>
 <script type="importmap">
@@ -73,5 +90,7 @@
 </head>
 <body>
   <div id="root"></div>
+  <!-- CRITICAL: Explicitly link the entry point for static hosting -->
+  <script type="module" src="index.tsx"></script>
 </body>
 </html>
