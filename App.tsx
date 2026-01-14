@@ -231,8 +231,8 @@ const App: React.FC = () => {
           </div>
           
           <div className="h-4 flex justify-center items-center">
-            {isProcessing && <p className="text-[10px] font-cyber text-[#00f3ff] animate-pulse uppercase tracking-[0.2em]">>> Quantizing Lifestyle Evidence...</p>}
-            {isRecording && <p className="text-[10px] font-cyber text-red-500 animate-pulse uppercase tracking-[0.2em]">>> Capturing Voice Buffer...</p>}
+            {isProcessing && <p className="text-[10px] font-cyber text-[#00f3ff] animate-pulse uppercase tracking-[0.2em]">{" >> "} Quantizing Lifestyle Evidence...</p>}
+            {isRecording && <p className="text-[10px] font-cyber text-red-500 animate-pulse uppercase tracking-[0.2em]">{" >> "} Capturing Voice Buffer...</p>}
             {error && <p className="text-[10px] font-cyber text-red-400 uppercase tracking-widest font-bold">!! SYSTEM ERROR: {error}</p>}
           </div>
         </div>
