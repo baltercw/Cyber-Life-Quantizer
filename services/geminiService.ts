@@ -1,8 +1,5 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
-import { CyberStats } from "../types";
-
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 const ANALYSIS_SCHEMA = {
   type: Type.OBJECT,
@@ -19,18 +16,20 @@ const ANALYSIS_SCHEMA = {
       },
       required: ["body", "intelligence", "reflexes", "technical", "cool"]
     },
-    comment: { type: Type.STRING, description: "A short (10-15 words) cynical, cyberpunk-themed observation about the event in Traditional Chinese." }
+    comment: { type: Type.STRING, description: "A short (10-15 words) observation about the event in Traditional Chinese." }
   },
   required: ["eventName", "statChanges", "comment"]
 };
 
 export const geminiService = {
   analyzeInput: async (prompt: string, mediaData?: { mimeType: string, data: string }) => {
+    // Guidelines: Use process.env.API_KEY directly for initializing GoogleGenAI.
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+    
     const systemInstruction = `
-      You are a Cyber-Life Quantizer OS. Your task is to analyze user input (text, voice transcriptions, or images) and quantify it into Cyberpunk 2077 style stats.
-      The stats are: Body (肉體), Intelligence (智力), Reflexes (反應), Technical (技術), Cool (酷勁).
-      Focus on realism: if someone eats ramen, maybe 'Cool' goes up but 'Body' stays same. If someone codes, 'Intelligence' and 'Technical' go up.
-      Return the response in a structured JSON format.
+      You are a Cyber-Life Quantizer OS. Your task is to analyze user input (text, voice, or images) and quantify it into RPG stats.
+      Stats: Body (肉體), Intelligence (智力), Reflexes (反應), Technical (技術), Cool (酷勁).
+      Return response in structured JSON.
     `;
 
     const contents: any[] = [{ text: prompt }];
@@ -54,6 +53,7 @@ export const geminiService = {
         }
       });
 
+      // Guidelines: Access the .text property directly, it is not a method.
       if (!response.text) throw new Error("Empty AI response");
       return JSON.parse(response.text);
     } catch (error) {

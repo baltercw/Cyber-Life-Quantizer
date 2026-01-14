@@ -15,20 +15,18 @@ const App: React.FC = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [textInput, setTextInput] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [envStatus, setEnvStatus] = useState({ 
-    api: !!process.env.API_KEY, 
-    supabase: !!process.env.SUPABASE_URL 
-  });
+  
+  // Follow guidelines: Avoid dedicated UI for managing API_KEY. 
+  // Simplified environment detection for Supabase status display only.
+  const hasSupabase = !!(typeof process !== 'undefined' && process.env.SUPABASE_URL);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (envStatus.api) {
-      refreshData();
-    }
-  }, [envStatus]);
+    refreshData();
+  }, []);
 
   const refreshData = async () => {
     setIsRefreshing(true);
@@ -63,7 +61,7 @@ const App: React.FC = () => {
       const result = await geminiService.analyzeInput(`Analyze life update: "${content}"`);
       await saveNewSnippet({ ...result, type: 'text' });
     } catch (err) {
-      setError("AI Analysis failed.");
+      setError("AI Analysis failed. Check connection.");
       setTextInput(content);
     } finally {
       setIsProcessing(false);
@@ -140,29 +138,6 @@ const App: React.FC = () => {
     await refreshData();
   };
 
-  // Setup Guard UI
-  if (!envStatus.api) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-[#050505] p-8 text-center">
-        <div className="w-20 h-20 mb-6 bg-[#00f3ff]/10 rounded-full flex items-center justify-center animate-pulse border border-[#00f3ff]">
-          <Cpu className="text-[#00f3ff]" size={40} />
-        </div>
-        <h1 className="font-cyber text-2xl text-[#00f3ff] mb-4 tracking-tighter">NEURAL LINK OFFLINE</h1>
-        <div className="bg-[#111] border border-red-500/50 p-6 rounded-lg max-w-sm">
-          <AlertTriangle className="text-red-500 mx-auto mb-3" />
-          <p className="text-gray-400 text-sm font-mono mb-4 leading-relaxed">
-            CRITICAL ERROR: Environment variables missing. The system requires <code className="text-[#39ff14]">API_KEY</code> to initialize AI Core.
-          </p>
-          <div className="text-[10px] text-left text-gray-600 space-y-2 uppercase">
-            <p>> Push code to GitHub</p>
-            <p>> Connect to Vercel</p>
-            <p>> Set API_KEY in Vercel Dashboard</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="max-w-md mx-auto min-h-screen flex flex-col p-4 bg-[#050505] selection:bg-[#00f3ff] selection:text-black">
       <header className="mb-6 flex justify-between items-center border-b border-[#00f3ff]/30 pb-4">
@@ -171,7 +146,7 @@ const App: React.FC = () => {
             CYBER-LIFE <span className="text-[#39ff14]">QUANTIZER</span>
           </h1>
           <p className="text-[10px] text-gray-500 uppercase tracking-widest mt-1">
-            System OS v2.1.0 // {envStatus.supabase ? 'Cloud-Sync Active' : 'Local Buffer Only'}
+            System OS v2.2.0 // {hasSupabase ? 'Cloud-Sync Enabled' : 'Local Buffer Active'}
           </p>
         </div>
         <div className="flex gap-2">
@@ -203,14 +178,14 @@ const App: React.FC = () => {
       <main className="flex-1 overflow-y-auto no-scrollbar space-y-4 pb-48">
         <div className="flex justify-between items-center mb-4 px-1">
           <h2 className="font-cyber text-xs uppercase tracking-[0.2em] text-gray-400 flex items-center gap-2">
-            <Terminal size={14} className="text-[#00f3ff]" /> System_Logs.v2
+            <Terminal size={14} className="text-[#00f3ff]" /> System_Logs.bin
           </h2>
-          <span className="text-[10px] text-gray-600 font-mono">COUNT: {snippets.length}</span>
+          <span className="text-[10px] text-gray-600 font-mono">PACKETS: {snippets.length}</span>
         </div>
 
         {snippets.length === 0 && !isRefreshing ? (
           <div className="text-center py-20 border-2 border-dashed border-[#222] rounded-lg">
-            <p className="text-gray-600 font-mono text-sm uppercase">Neural cloud synchronized. No packets found.</p>
+            <p className="text-gray-600 font-mono text-sm uppercase">Neural grid online. Awaiting lifestyle packets...</p>
           </div>
         ) : (
           snippets.map((s) => <EventCard key={s.id} snippet={s} />)
@@ -224,7 +199,7 @@ const App: React.FC = () => {
               type="text"
               value={textInput}
               onChange={(e) => setTextInput(e.target.value)}
-              placeholder="Inject lifestyle packet..."
+              placeholder="Inject experience packet..."
               className="flex-1 bg-transparent text-[#00f3ff] text-sm font-mono outline-none px-2"
               disabled={isProcessing}
             />
@@ -256,9 +231,9 @@ const App: React.FC = () => {
           </div>
           
           <div className="h-4 flex justify-center items-center">
-            {isProcessing && <p className="text-[10px] font-cyber text-[#00f3ff] animate-pulse uppercase tracking-[0.2em]">>> Accessing Neural Grid...</p>}
-            {isRecording && <p className="text-[10px] font-cyber text-red-500 animate-pulse uppercase tracking-[0.2em]">>> Encoding Voice Fragment...</p>}
-            {error && <p className="text-[10px] font-cyber text-red-400 uppercase tracking-widest font-bold">!! ERROR: {error}</p>}
+            {isProcessing && <p className="text-[10px] font-cyber text-[#00f3ff] animate-pulse uppercase tracking-[0.2em]">>> Quantizing Lifestyle Evidence...</p>}
+            {isRecording && <p className="text-[10px] font-cyber text-red-500 animate-pulse uppercase tracking-[0.2em]">>> Capturing Voice Buffer...</p>}
+            {error && <p className="text-[10px] font-cyber text-red-400 uppercase tracking-widest font-bold">!! SYSTEM ERROR: {error}</p>}
           </div>
         </div>
       </div>

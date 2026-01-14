@@ -2,9 +2,17 @@
 import { createClient } from '@supabase/supabase-js';
 import { LifeSnippet, CyberStats } from '../types';
 
-// These should be set in your Vercel/environment settings
-const supabaseUrl = process.env.SUPABASE_URL || '';
-const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || '';
+// Safe access to environment variables
+const getEnv = (key: string) => {
+  try {
+    return typeof process !== 'undefined' ? process.env[key] : undefined;
+  } catch {
+    return undefined;
+  }
+};
+
+const supabaseUrl = getEnv('SUPABASE_URL') || '';
+const supabaseAnonKey = getEnv('SUPABASE_ANON_KEY') || '';
 
 const supabase = (supabaseUrl && supabaseAnonKey) 
   ? createClient(supabaseUrl, supabaseAnonKey)
@@ -14,12 +22,10 @@ const LOCAL_KEY = 'cyber_life_snippets';
 
 export const storageService = {
   saveSnippet: async (snippet: LifeSnippet) => {
-    // Save to Local for immediate feedback
     const localSnippets = storageService.getLocalSnippets();
     localSnippets.unshift(snippet);
     localStorage.setItem(LOCAL_KEY, JSON.stringify(localSnippets));
 
-    // Sync to Supabase if available
     if (supabase) {
       try {
         const { error } = await supabase
@@ -41,8 +47,12 @@ export const storageService = {
   },
 
   getLocalSnippets: (): LifeSnippet[] => {
-    const data = localStorage.getItem(LOCAL_KEY);
-    return data ? JSON.parse(data) : [];
+    try {
+      const data = localStorage.getItem(LOCAL_KEY);
+      return data ? JSON.parse(data) : [];
+    } catch {
+      return [];
+    }
   },
 
   getSnippets: async (): Promise<LifeSnippet[]> => {
@@ -66,11 +76,9 @@ export const storageService = {
         mediaUrl: item.media_url
       }));
 
-      // Merge and update local storage
       localStorage.setItem(LOCAL_KEY, JSON.stringify(cloudSnippets));
       return cloudSnippets;
     } catch (e) {
-      console.warn("Falling back to local storage:", e);
       return storageService.getLocalSnippets();
     }
   },
@@ -85,11 +93,11 @@ export const storageService = {
     };
 
     return snippets.reduce((acc, snippet) => {
-      acc.body += snippet.statChanges.body;
-      acc.intelligence += snippet.statChanges.intelligence;
-      acc.reflexes += snippet.statChanges.reflexes;
-      acc.technical += snippet.statChanges.technical;
-      acc.cool += snippet.statChanges.cool;
+      acc.body += (snippet.statChanges.body || 0);
+      acc.intelligence += (snippet.statChanges.intelligence || 0);
+      acc.reflexes += (snippet.statChanges.reflexes || 0);
+      acc.technical += (snippet.statChanges.technical || 0);
+      acc.cool += (snippet.statChanges.cool || 0);
       return acc;
     }, baseStats);
   },

@@ -24,7 +24,8 @@ const RadarChartDisplay: React.FC<Props> = ({ stats }) => {
   ];
 
   // We use the sum of stats as a key to force re-render/re-animation of the chart when data changes
-  const animationKey = Object.values(stats).reduce((a, b) => a + b, 0);
+  // Fix: Explicitly cast Object.values to number[] to resolve '+' operator type mismatch on unknown values
+  const animationKey = (Object.values(stats) as number[]).reduce((a: number, b: number) => a + b, 0);
 
   return (
     <div className="w-full h-64 md:h-80 flex justify-center items-center">
